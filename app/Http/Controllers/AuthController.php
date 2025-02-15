@@ -27,7 +27,7 @@ class AuthController extends Controller
         $user = User::create([
             'name' => $validatedData['name'],
             'email' => $validatedData['email'],
-            'password' => Hash::make($validatedData['password']), // Hash the password
+            'password' => Hash::make($validatedData['password']),
         ]);
 
         return response()->json(['message' => 'User registered successfully.'], 201);
@@ -38,24 +38,20 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        $sample = new Sample();
-        dd($sample->test());
         $validatedData = $request->validate([
             'email' => 'required|string|email',
             'password' => 'required|string',
         ]);
-        // dd(Auth::attempt($validatedData));
-        // Attempt to log in the user
+
         if (!Auth::attempt($validatedData)) {
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
             ]);
         }
-        // dd(0);
-        $user = Auth::user(); // Get the authenticated user
-        // dd($user);
-        $token = $user->createToken('SystemCore')->accessToken; // Create an access token
-        // dd($token);
+
+        $user = Auth::user();
+        $token = $user->createToken('SystemCore')->accessToken;
+
         return response()->json(['access_token' => $token, 'token_type' => 'Bearer', 'expires_in' => 3600]);
     }
 
